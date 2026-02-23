@@ -1,12 +1,18 @@
-# Homelab K3s Cluster on Proxmox
+# Homelab K3s Cluster
 
-Automated deployment of a K3s Kubernetes cluster on Proxmox using Terraform. This project provisions a lightweight Kubernetes environment with one server node and two agent nodes, perfect for homelab experimentation and learning.
+Automated deployment of a K3s Kubernetes cluster using either Terraform (Proxmox) or Vagrant (VirtualBox). This project provisions a lightweight Kubernetes environment with one server node and two agent nodes, perfect for homelab experimentation and learning.
 
 ## Architecture
 
+### Terraform (Proxmox)
 - **k3s-server** (192.168.1.80) - Control plane node with 2GB RAM
 - **k3s-agent-1** (192.168.1.81) - Worker node with 1GB RAM
 - **k3s-agent-2** (192.168.1.82) - Worker node with 1GB RAM
+
+### Vagrant (VirtualBox)
+- **k3s-server** (192.168.1.100) - Control plane node with 2GB RAM, 2 CPUs
+- **k3s-agent-1** (192.168.1.101) - Worker node with 1GB RAM, 2 CPUs
+- **k3s-agent-2** (192.168.1.102) - Worker node with 1GB RAM, 2 CPUs
 
 ## Features
 
@@ -18,19 +24,23 @@ Automated deployment of a K3s Kubernetes cluster on Proxmox using Terraform. Thi
 
 ## Prerequisites
 
-### Proxmox Setup
+### Terraform (Proxmox)
 - Proxmox VE 8.0.3 installed and configured
 - API token created with appropriate permissions
 - Cloud-init enabled Debian 13 template
 - Network bridge `vmbr0` configured
-
-
-### Local Requirements
 - Terraform 1.14.x
 - SSH key pair generated
 - Network access to Proxmox host
 
+### Vagrant (VirtualBox)
+- VirtualBox installed
+- Vagrant installed
+- At least 4GB RAM available for VMs
+
 ## Quick Start
+
+### Option 1: Terraform (Proxmox)
 
 1. **Clone the repository**
    ```bash
@@ -69,6 +79,30 @@ Automated deployment of a K3s Kubernetes cluster on Proxmox using Terraform. Thi
    sudo kubectl get nodes
    ```
 
+### Option 2: Vagrant (VirtualBox)
+
+1. **Clone the repository**
+   ```bash
+   git clone github.com/dmitkov28/homelab-k3s homelab-k3s
+   cd homelab-k3s/vagrant
+   ```
+
+2. **(Optional) Set K3s token**
+   ```bash
+   export K3S_TOKEN="your-custom-token"
+   ```
+
+3. **Deploy the cluster**
+   ```bash
+   vagrant up
+   ```
+
+4. **Access your cluster**
+   ```bash
+   vagrant ssh k3s-server
+   sudo kubectl get nodes
+   ```
+
 
 ## How It Works
 
@@ -79,11 +113,17 @@ Automated deployment of a K3s Kubernetes cluster on Proxmox using Terraform. Thi
 
 
 ## Cleanup
-VMs must not be running for the `destroy` command to work, so make sure to stop them first.
 
+### Terraform
+VMs must not be running for the `destroy` command to work, so make sure to stop them first.
 
 ```bash
 terraform destroy
 ```
 
 This removes all VMs but preserves the template.
+
+### Vagrant
+```bash
+vagrant destroy -f
+```
